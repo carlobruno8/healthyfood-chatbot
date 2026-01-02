@@ -1,0 +1,9 @@
+[theme]
+base = "dark"
+
+primaryColor = "#7dd3fc"        # soft blue
+backgroundColor = "#0f172a"     # slate-900
+secondaryBackgroundColor = "#020617"  # near-black
+textColor = "#e5e7eb"           # light gray
+
+font = "sans serif"

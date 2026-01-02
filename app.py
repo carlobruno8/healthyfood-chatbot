@@ -15,18 +15,17 @@ load_dotenv()
 client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
 st.set_page_config(
-    page_title="Weekly Food Health Checker",
+    page_title="Food Health Checker",
     page_icon="🥗",
 )
 
-st.title("🥗 Weekly Food Health Checker")
+st.title("🥗 Food Health Checker")
 st.write(
-    "Write what you roughly ate this week. "
-    "The app gives a **high-level health score** and **practical suggestions** "
-    "based on public nutrition guidelines.\n\n"
-    "_This is not medical advice — just a helpful weekly check-in._"
+    "This is a quick, judgment-free check-in on how healthy your diet is.\n\n"
+    "Just write roughly what you ate — no need to be perfect. "
+    "You’ll get a high-level score and a few practical suggestions.\n\n"
+    "_Not medical advice. Just perspective._"
 )
-
 
 # --------------------------------------------------
 # Helper for nice list rendering
@@ -53,7 +52,7 @@ food_log = st.text_area(
 # Analyze
 # --------------------------------------------------
 
-if st.button("Analyze my week"):
+if st.button("Check my diet 🥗"):
     if not food_log.strip():
         st.warning("Please enter what you ate this week.")
     else:
@@ -88,14 +87,25 @@ if st.button("Analyze my week"):
             st.subheader("Summary")
             st.write(data["summary"])
 
-            st.subheader("✅ Positives")
-            render_list(data["positives"])
 
-            st.subheader("⚠️ Concerns")
-            render_list(data["concerns"])
+            st.subheader("⭐ Top 3 things to focus on next week")
 
-            st.subheader("🥦 Missing nutrients")
-            render_list(data["missing_nutrients"])
+            top_recs = data["recommendations"][:3]
+            for rec in top_recs:
+                st.write(f"- {rec}")
+
+
+            st.subheader("More detailed analysis")
+
+            with st.expander("See details: positives, concerns & nutrients"):
+                st.subheader("✅ Positives")
+                render_list(data["positives"])
+
+                st.subheader("⚠️ Concerns")
+                render_list(data["concerns"])
+
+                st.subheader("🥦 Missing nutrients")
+                render_list(data["missing_nutrients"])
 
             st.subheader("🍎 Recommendations")
             render_list(data["recommendations"])
@@ -103,3 +113,11 @@ if st.button("Analyze my week"):
         except Exception:
             st.error("The model returned an unexpected format.")
             st.text(response.text)
+
+st.markdown("")
+st.markdown("")
+st.markdown("---")
+st.caption(
+
+    "_If you are reading this, thanks for testing my LLM + RAG experiment._"
+)
