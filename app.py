@@ -74,7 +74,8 @@ analyze_clicked = st.button(
 # Scroll anchor (results target)
 # --------------------------------------------------
 
-st.markdown('<div id="results"></div>', unsafe_allow_html=True)
+st.markdown("## Your results")
+st.markdown('<div id="results-anchor"></div>', unsafe_allow_html=True)
 
 # --------------------------------------------------
 # Auto-scroll on click
@@ -85,11 +86,19 @@ if analyze_clicked:
         """
         <script>
         setTimeout(() => {
-            const el = document.getElementById("results");
-            if (el) {
-                el.scrollIntoView({ behavior: "smooth", block: "start" });
-            }
-        }, 300);
+            const anchor = document.getElementById("results-anchor");
+            if (!anchor) return;
+
+            const y =
+                anchor.getBoundingClientRect().top +
+                window.pageYOffset -
+                20;
+
+            window.scrollTo({
+                top: y,
+                behavior: "smooth"
+            });
+        }, 600);
         </script>
         """,
         unsafe_allow_html=True
