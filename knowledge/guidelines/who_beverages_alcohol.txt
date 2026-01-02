@@ -1,0 +1,30 @@
+SOURCE:
+World Health Organization (WHO)
+Healthy Diet – Fact Sheet
+https://www.who.int/news-room/fact-sheets/detail/healthy-diet
+
+AUTHORITY:
+World Health Organization (international public health authority)
+
+TOPIC:
+Beverages, alcohol, and sugary drinks
+
+CLAIM:
+Consumption of sugar-sweetened beverages and alcohol should be limited
+as part of a healthy diet.
+
+RATIONALE:
+Sugar-sweetened beverages provide large amounts of free sugars with little
+nutritional value and are associated with weight gain and increased risk of
+noncommunicable diseases.
+Alcohol consumption contributes excess energy intake and is associated with
+multiple health risks, including liver disease and cardiovascular conditions.
+
+PRACTICAL IMPLICATIONS:
+- Prefer water, unsweetened tea, or coffee without added sugar as primary beverages
+- Limit fruit juice intake and prioritize whole fruits instead
+- Treat alcoholic drinks such as beer and wine as occasional rather than daily choices
+
+LIMITATIONS:
+This guidance is population-based and does not provide individualized recommendations
+regarding alcohol tolerance or medical conditions.

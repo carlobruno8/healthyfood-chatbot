@@ -1,0 +1,28 @@
+SOURCE:
+World Health Organization (WHO)
+Healthy Diet – Fact Sheet
+https://www.who.int/news-room/fact-sheets/detail/healthy-diet
+
+AUTHORITY:
+World Health Organization (international public health authority)
+
+TOPIC:
+Fruits and vegetables
+
+CLAIM:
+Adults should consume at least 400 grams (approximately 5 portions) of fruits and vegetables per day.
+
+RATIONALE:
+Adequate intake of fruits and vegetables reduces the risk of noncommunicable diseases,
+including cardiovascular disease, stroke, and certain cancers.
+Fruits and vegetables are important sources of dietary fiber, vitamins
+(such as vitamin C, vitamin A, and folate), and minerals.
+
+PRACTICAL IMPLICATIONS:
+- Include vegetables in at least two main meals per day
+- Consume fruit as snacks or desserts instead of sugary foods
+- Aim for a variety of colors across the week to increase micronutrient diversity
+
+LIMITATIONS:
+This recommendation applies to healthy adults and does not replace individualized
+medical or dietary advice.

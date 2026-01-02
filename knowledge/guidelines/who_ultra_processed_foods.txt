@@ -1,0 +1,27 @@
+SOURCE:
+World Health Organization (WHO)
+Healthy Diet – Technical Background (PDF)
+https://apps.who.int/iris/handle/10665/325828
+
+AUTHORITY:
+World Health Organization (international public health authority)
+
+TOPIC:
+Ultra-processed foods
+
+CLAIM:
+High consumption of ultra-processed foods is associated with poorer diet quality
+and increased risk of noncommunicable diseases.
+
+RATIONALE:
+Ultra-processed foods are typically high in free sugars, saturated fats, and sodium,
+while being low in dietary fiber, vitamins, and minerals.
+Frequent consumption displaces healthier whole foods in the diet.
+
+PRACTICAL IMPLICATIONS:
+- Limit intake of packaged snacks, sweets, and ready-made meals
+- Prefer minimally processed foods such as vegetables, legumes, whole grains, and fish
+- Use cooking methods based on fresh ingredients when possible
+
+LIMITATIONS:
+This guidance is population-based and does not assess individual metabolic or medical conditions.

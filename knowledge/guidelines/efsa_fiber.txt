@@ -1,0 +1,28 @@
+SOURCE:
+European Food Safety Authority (EFSA)
+Dietary Reference Values for Fibre
+EFSA Journal (2015)
+https://www.efsa.europa.eu/en/efsajournal/pub/4254
+
+AUTHORITY:
+European Food Safety Authority (EU scientific risk assessment body)
+
+TOPIC:
+Dietary fiber
+
+CLAIM:
+An adequate intake of dietary fiber for adults is 25 grams per day.
+
+RATIONALE:
+Adequate fiber intake supports normal bowel function and is associated with
+reduced risk of cardiovascular disease, type 2 diabetes, and colorectal cancer.
+Fiber contributes to satiety and overall dietary quality.
+
+PRACTICAL IMPLICATIONS:
+- Include whole grains such as oats, whole wheat, and brown rice
+- Consume legumes (beans, lentils, chickpeas) regularly
+- Increase intake of vegetables, fruits, nuts, and seeds
+
+LIMITATIONS:
+This value represents an adequate intake for the general adult population
+and may vary depending on individual energy needs and health conditions.

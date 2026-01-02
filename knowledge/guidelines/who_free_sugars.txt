@@ -1,0 +1,28 @@
+SOURCE:
+World Health Organization (WHO)
+Guideline: Sugars intake for adults and children
+https://www.who.int/publications/i/item/9789241549028
+
+AUTHORITY:
+World Health Organization (international public health authority)
+
+TOPIC:
+Free sugars
+
+CLAIM:
+Free sugars should account for less than 10% of total daily energy intake.
+Reducing intake below 5% provides additional health benefits.
+
+RATIONALE:
+High intake of free sugars is associated with increased risk of overweight,
+obesity, and dental caries.
+Free sugars contribute energy without providing essential nutrients.
+
+PRACTICAL IMPLICATIONS:
+- Limit consumption of sugary drinks, sweets, and desserts
+- Prefer whole fruit over fruit juices
+- Be cautious with processed foods containing added sugars
+
+LIMITATIONS:
+This guideline applies to free sugars and does not include sugars naturally
+present in whole fruits, vegetables, and milk.
