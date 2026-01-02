@@ -7,7 +7,7 @@ def load_knowledge_chunks():
         for file in files:
             if file.endswith(".txt"):
                 path = os.path.join(root, file)
-                with open(path, "r") as f:
+                with open(path, "r", encoding="utf-8") as f:
                     chunks.append({
                         "id": file,
                         "content": f.read()
@@ -31,6 +31,7 @@ def select_relevant_chunks(food_log: str, chunks: list, max_chunks: int = 4):
 
     return [chunk for _, chunk in scored_chunks[:max_chunks]]
 
+
 SYSTEM_INSTRUCTION = """
 You are a nutrition analysis assistant.
 
@@ -40,20 +41,19 @@ Rules:
 - Assume a healthy adult with no allergies
 - Be practical, supportive, and concise
 - Do not moralize food choices
-- Keep it short and clean in terms of information
-- Feel free to quote sources specified, but only the if listed in the guidelines 
+- Keep information short and clear
 - If a claim is not supported by the provided guidelines, do not include it
-- Make sure the result for key recommendation only has one, clear recommendation
 
-When referencing sources inline in text fields, use human-readable
-authority names, for example:
-- (World Health Organization - WHO)
-- (European Food Safety Authority - EFSA)
+When referencing sources inline in text fields, use human-readable authority names:
+- (World Health Organization – WHO)
+- (European Food Safety Authority – EFSA)
+- (BMJ – British Medical Journal)
 
 Do NOT include file names, source IDs, URLs, or technical identifiers
 inside text fields.
 
-Source IDs may only be used internally and in the "sources" field if requested.
+Include a structured "sources" field listing only sources that were actually used.
+Do not invent sources.
 
 Scoring guidelines:
 - 0–40: Poor
@@ -65,15 +65,8 @@ Output rules:
 - Return VALID JSON ONLY
 - Do not include markdown
 - Do not include explanations outside JSON
-
-In addition to inline authority labels (e.g. WHO, EFSA, BMJ),
-include a structured "sources" field.
-
-Only include sources that were actually used.
-Each source must reference one of the source IDs provided.
-Do not invent sources.
-
 """
+
 
 def build_user_prompt(food_log: str) -> str:
     all_chunks = load_knowledge_chunks()
@@ -88,10 +81,12 @@ You are given the following nutrition knowledge.
 Each source has an ID.
 
 Source label mapping:
-- who_fruits_vegetables.txt → WHO
-- who_free_sugars.txt → WHO
-- efsa_fiber.txt → EFSA
-- mediterranean_diet.txt → BMJ
+- who_fruits_vegetables.txt → World Health Organization (WHO)
+- who_free_sugars.txt → World Health Organization (WHO)
+- who_ultra_processed_foods.txt → World Health Organization (WHO)
+- who_beverages_alcohol.txt → World Health Organization (WHO)
+- efsa_fiber.txt → European Food Safety Authority (EFSA)
+- mediterranean_diet.txt → BMJ (British Medical Journal)
 
 {knowledge_text}
 
@@ -103,9 +98,9 @@ Analyze the diet USING ONLY the information from the sources above
 and return a JSON object with EXACTLY these keys:
 - "overall_score": number between 0 and 100
 - "summary": string
-- "positives": array of strings
-- "concerns": array of strings
-- "missing_nutrients": array of strings
+- "positives": array of strings (or empty array)
+- "concerns": array of strings (or empty array)
+- "missing_nutrients": array of strings (or empty array)
 - "recommendation": string
 - "sources": array of objects, each with:
     - "source_id": string

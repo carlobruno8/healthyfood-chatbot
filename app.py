@@ -1,4 +1,3 @@
-import os
 import json
 import streamlit as st
 from dotenv import load_dotenv
@@ -21,8 +20,7 @@ SOURCE_LABELS = {
 # --------------------------------------------------
 
 load_dotenv()
-
-client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+client = genai.Client()
 
 st.set_page_config(
     page_title="Food Health Checker",
@@ -31,22 +29,25 @@ st.set_page_config(
 
 st.title("🥗 Food Health Checker")
 st.write(
-    "This is a quick check-in on how healthy your diet is.\n\n"
+    "This is a quick, judgment-free check-in on how healthy your diet is.\n\n"
     "Just write roughly what you ate — no need to be perfect. "
-    "You’ll get a high-level score and a few practical suggestions. This app will only use official sources for suggestions (WHO, EFSA). "
+    "You’ll get a high-level score and one clear thing to focus on.\n\n"
     "_Not medical advice._"
 )
 
 # --------------------------------------------------
-# Helper for nice list rendering
+# Helpers
 # --------------------------------------------------
 
 def render_list(items):
+    if not items:
+        st.write("- None")
+        return
     for item in items:
         st.write(f"- {item}")
 
 # --------------------------------------------------
-# Text input
+# Input
 # --------------------------------------------------
 
 food_log = st.text_area(
@@ -55,64 +56,28 @@ food_log = st.text_area(
     placeholder=(
         "Monday: bread with jam, banana, pasta carbonara, salad\n"
         "Tuesday: yogurt with granola, chicken sandwich, rice with vegetables\n"
-        "7 coffees, 3 glasses of wine, 2 beers, 1 fruitshake"
+        "7 coffees, 3 glasses of wine, 2 beers, 1 fruit smoothie"
     ),
 )
 
 st.markdown("")
-
-# --------------------------------------------------
-# Primary action button (full width)
-# --------------------------------------------------
 
 analyze_clicked = st.button(
     "🥗 Check my diet",
     use_container_width=True
 )
 
-# --------------------------------------------------
-# Scroll anchor (results target)
-# --------------------------------------------------
-
-st.markdown("## Your results")
-st.markdown('<div id="results-anchor"></div>', unsafe_allow_html=True)
-
-# --------------------------------------------------
-# Auto-scroll on click
-# --------------------------------------------------
-
 if analyze_clicked:
-    st.markdown(
-        """
-        <script>
-        setTimeout(() => {
-            const anchor = document.getElementById("results-anchor");
-            if (!anchor) return;
-
-            const y =
-                anchor.getBoundingClientRect().top +
-                window.pageYOffset -
-                20;
-
-            window.scrollTo({
-                top: y,
-                behavior: "smooth"
-            });
-        }, 600);
-        </script>
-        """,
-        unsafe_allow_html=True
-    )
+    st.info("⬇️ Your results are shown below. This may take a few seconds.")
 
 # --------------------------------------------------
-# Analyze
+# Analysis
 # --------------------------------------------------
 
 if analyze_clicked:
     if not food_log.strip():
         st.warning("Please enter what you ate this week.")
     else:
-        # Call the model (handle rate limits)
         with st.spinner("Looking at patterns in your week…"):
             try:
                 response = client.models.generate_content(
@@ -132,11 +97,12 @@ if analyze_clicked:
                     st.stop()
                 else:
                     raise
+
         try:
             data = json.loads(response.text)
-            score = data["overall_score"]
 
-            st.markdown("")
+            score = data.get("overall_score", 0)
+
             st.subheader("Overall health score")
             st.progress(score / 100)
             st.markdown(f"### **{score} / 100**")
@@ -150,48 +116,43 @@ if analyze_clicked:
             else:
                 st.caption("Excellent overall balance")
 
-            st.markdown("")
             st.subheader("Summary")
-            st.write(data["summary"])
+            st.write(data.get("summary", ""))
 
-            st.markdown("")
             st.markdown("### ⭐ Focus for next week")
-            st.info(data["recommendation"])
-
-            st.markdown("")
+            st.info(data.get("recommendation", ""))
 
             st.caption("If you’re curious, you can dig a bit deeper 👇")
 
             with st.expander("See details: positives, concerns & nutrients"):
                 st.subheader("✅ Positives")
-                render_list(data["positives"])
+                render_list(data.get("positives"))
 
                 st.subheader("⚠️ Concerns")
-                render_list(data["concerns"])
+                render_list(data.get("concerns"))
 
                 st.subheader("🥦 Missing nutrients")
-                render_list(data["missing_nutrients"])
-
-            st.subheader("📚 Why this advice")
+                render_list(data.get("missing_nutrients"))
 
             with st.expander("📚 Why this advice"):
-                for src in data["sources"]:
-                    label = SOURCE_LABELS.get(src["source_id"], src["source_id"])
+                for src in data.get("sources", []):
+                    label = SOURCE_LABELS.get(src.get("source_id"), src.get("source_id"))
                     st.markdown(f"**{label}**")
-                    st.caption(src["reason"])
+                    st.caption(src.get("reason", ""))
                     st.markdown("---")
 
-            st.markdown("")                
-
-        except Exception:
-            st.error("The model returned an unexpected format.")
-            st.text(response.text)
+        except json.JSONDecodeError:
+            st.error("The model returned invalid JSON.")
+            st.code(response.text)
+        except Exception as e:
+            st.error("Something went wrong while displaying the results.")
+            st.exception(e)
+            st.code(response.text)
 
 # --------------------------------------------------
 # Footer
 # --------------------------------------------------
 
-st.markdown("")
 st.markdown("---")
 st.caption(
     "_If you are reading this, thanks for testing my LLM + RAG experiment._"
