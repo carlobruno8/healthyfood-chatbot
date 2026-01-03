@@ -1,61 +1,156 @@
-# Food Health Checker
+# Food Health Checker — Grounded Nutrition Feedback with RAG
 
-A small experimental app that uses a Large Language Model (Gemini) to analyze a
-weekly food log and provide a health score and practical dietary feedback.
+A lightweight web app that analyzes weekly eating habits and provides **source-grounded, non-judgmental nutrition feedback**, powered by Gemini and Retrieval-Augmented Generation (RAG).
 
-This project is built as a **learning exercise** to explore:
-- Prompt design
-- Retrieval-Augmented Generation (RAG)
-- LLM-backed applications
-- Lightweight deployment workflows
-
----
-
-## Live demo
+**Live app:**  
 https://healthyfood-chatbot-carlo.streamlit.app
 
 ---
 
-## sequence
+## What this app does
 
-1. You enter a free-text description of what you ate during the week.
-2. The app evaluates the input against high-level nutrition guidelines.
-3. It returns:
-   - An overall health score (0–100)
-   - A short summary
-   - Positives
-   - Concerns
-   - Missing nutrients
-   - Practical food-based recommendations
+This app lets users describe what they ate over the past week and returns:
 
-The app assumes a healthy adult with no allergies and does **not** provide medical advice.
+- An overall diet quality score (0–100)
+- A short, human-readable summary
+- One clear recommendation to focus on next week
+- Supporting positives, concerns, and missing nutrients
+- Transparent references to authoritative sources (WHO, EFSA, BMJ)
 
----
-
-## RAG
-
-The analysis is grounded using a small, explicit knowledge base based on:
-- World Health Organization (WHO) dietary guidance
-- European Food Safety Authority (EFSA) principles
-
-This is implemented via prompt-based RAG for clarity and transparency.
+**Important:**  
+This is **not medical advice**. The app is designed for learning and reflection only.
 
 ---
 
-## stack
+## Why this project exists
 
-- Python
-- Streamlit
-- Google Gemini API
-- Prompt-based RAG (no vector database)
+Large Language Models are powerful, but **unreliable without grounding** — especially for domains like nutrition where hallucinations are risky.
+
+This project was built to understand and implement:
+
+- Retrieval-Augmented Generation (RAG)
+- Semantic search with embeddings
+- Vector similarity search
+- Source attribution and guardrails
+- Practical deployment of an LLM-powered app
+
+Rather than a prompt-only demo, the app **forces the model to reason strictly over retrieved guideline content**.
 
 ---
 
-## run locally
-pip install -r requirements.txt
-streamlit run app.py
+## High-level architecture
+
+User input (food log)
+↓
+Gemini embedding model
+↓
+FAISS vector similarity search
+↓
+Relevant guideline chunks
+↓
+Grounded prompt to Gemini
+↓
+Structured JSON response
+↓
+Streamlit UI + source explanations
 
 ---
 
-## disclaimer
-This project is for educational and experimental purposes only. It does not provide medical or personalized dietary advice.
+## How RAG works in this app
+
+This app uses **Retrieval-Augmented Generation (RAG)** to ensure all advice is grounded in official nutrition guidelines rather than the model’s general knowledge.
+
+### 1. Knowledge ingestion
+- Nutrition guidelines are stored as plain `.txt` files in the `knowledge/` folder
+- Each file represents an authoritative source (e.g. WHO, EFSA, BMJ)
+- Each file is treated as a **knowledge chunk**
+
+### 2. Embedding the knowledge
+- Each knowledge chunk is converted into a vector using:
+  - `models/text-embedding-004` (Gemini)
+- These vectors capture **semantic meaning**, not just keywords
+
+### 3. Building the vector index
+- All embeddings are stored in a local **FAISS** index
+- FAISS enables fast similarity search without any external services
+- This keeps the system:
+  - Lightweight
+  - Easy to reason about
+  - Cheap to run
+
+### 4. Semantic retrieval
+- The user’s food log is also embedded
+- FAISS retrieves the **most semantically similar** guideline chunks
+- This solves issues like:
+  - “banana” → “fruit”
+  - “wine” → “alcohol”
+  - “fiber” → “whole grains”
+
+### 5. Grounded generation
+- Only retrieved chunks are injected into the prompt
+- The LLM is instructed to:
+  - Use **only the provided sources**
+  - Return **valid JSON only**
+  - Include a structured `sources` field
+  - Avoid unsupported claims or hallucinations
+
+### 6. Transparent output
+- The UI displays:
+  - One clear recommendation
+  - Supporting positives and concerns
+  - Which authoritative sources were used, and why
+
+---
+
+## Key design decisions
+
+### Why embeddings instead of keyword search?
+
+Keyword matching breaks quickly with real user input:
+- Different wording
+- Synonyms
+- Vague descriptions
+
+---
+
+### Why FAISS?
+
+- No managed service required
+- Full control over retrieval logic
+- Easy to debug and reason about
+- Perfect for small–medium knowledge bases
+
+FAISS can later be swapped for a managed vector database if needed.
+
+---
+
+## Sources used
+
+- World Health Organization (WHO)
+- European Food Safety Authority (EFSA)
+- BMJ (British Medical Journal)
+
+The model is explicitly instructed **not to invent sources** and to reference only retrieved content.
+
+---
+
+## Limitations (by design)
+
+- FAISS index is rebuilt per request (acceptable at this scale)
+- No user history or personalization
+- No medical personalization (intentionally avoided)
+
+---
+
+## Possible next steps
+
+- Persist and cache the FAISS index
+- Automatically ingest and chunk PDFs
+- Add hybrid retrieval (BM25 + embeddings)
+- Add evaluation to verify correct source usage
+- Introduce user feedback loops
+- Swap FAISS for a managed vector database if scaling
+- Support user uploading a photo of food to use as prompt
+- Support user recording voice to describe what user ate that week (instead of typing)
+
+---
