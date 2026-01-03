@@ -82,7 +82,7 @@ if analyze_clicked:
             try:
                 response = client.models.generate_content(
                     model="models/gemini-flash-latest",
-                    contents=build_user_prompt(food_log),
+                    contents=build_user_prompt(food_log, client),
                     config={
                         "system_instruction": SYSTEM_INSTRUCTION,
                         "temperature": 0.3,

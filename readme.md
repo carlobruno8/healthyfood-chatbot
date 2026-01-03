@@ -11,6 +11,11 @@ This project is built as a **learning exercise** to explore:
 
 ---
 
+## Live demo
+https://healthyfood-chatbot-carlo.streamlit.app
+
+---
+
 ## sequence
 
 1. You enter a free-text description of what you ate during the week.

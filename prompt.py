@@ -1,4 +1,21 @@
 import os
+import numpy as np
+import faiss
+from google import genai
+
+def embed_texts(texts: list[str], client) -> np.ndarray:
+    """
+    Convert a list of texts into embedding vectors using Gemini.
+    """
+    response = client.models.embed_content(
+        model="models/text-embedding-004",
+        contents=texts
+    )
+
+    embeddings = [e.values for e in response.embeddings]
+
+    return np.array(embeddings, dtype="float32")
+
 
 def load_knowledge_chunks():
     chunks = []
@@ -14,23 +31,21 @@ def load_knowledge_chunks():
                     })
     return chunks
 
+def build_knowledge_index(chunks: list, client):
+    """
+    Build a FAISS index from knowledge chunks.
+    """
+    texts = [chunk["content"] for chunk in chunks]
 
-def select_relevant_chunks(food_log: str, chunks: list, max_chunks: int = 4):
-    food_log_lower = food_log.lower()
-    scored_chunks = []
+    embeddings = embed_texts(texts, client)
 
-    for chunk in chunks:
-        score = sum(
-            1 for word in food_log_lower.split()
-            if word in chunk["content"].lower()
-        )
-        if score > 0:
-            scored_chunks.append((score, chunk))
+    dimension = embeddings.shape[1]
 
-    scored_chunks.sort(reverse=True, key=lambda x: x[0])
+    index = faiss.IndexFlatL2(dimension)
 
-    return [chunk for _, chunk in scored_chunks[:max_chunks]]
+    index.add(embeddings)
 
+    return index
 
 SYSTEM_INSTRUCTION = """
 You are a nutrition analysis assistant.
@@ -68,25 +83,31 @@ Output rules:
 """
 
 
-def build_user_prompt(food_log: str) -> str:
+def build_user_prompt(food_log: str, client) -> str:
+    # 1. Load all knowledge chunks
     all_chunks = load_knowledge_chunks()
-    relevant_chunks = select_relevant_chunks(food_log, all_chunks)
 
+    # 2. Build embeddings + FAISS index
+    index = build_knowledge_index(all_chunks, client)
+
+    # 3. Retrieve semantically relevant chunks
+    relevant_chunks = retrieve_relevant_chunks(
+        query=food_log,
+        chunks=all_chunks,
+        index=index,
+        client=client,
+        top_k=4
+    )
+
+    # 4. Assemble knowledge text
     knowledge_text = ""
     for chunk in relevant_chunks:
         knowledge_text += f"\n[Source ID: {chunk['id']}]\n{chunk['content']}\n"
 
+    # 5. Return the final prompt
     return f"""
 You are given the following nutrition knowledge.
 Each source has an ID.
-
-Source label mapping:
-- who_fruits_vegetables.txt → World Health Organization (WHO)
-- who_free_sugars.txt → World Health Organization (WHO)
-- who_ultra_processed_foods.txt → World Health Organization (WHO)
-- who_beverages_alcohol.txt → World Health Organization (WHO)
-- efsa_fiber.txt → European Food Safety Authority (EFSA)
-- mediterranean_diet.txt → BMJ (British Medical Journal)
 
 {knowledge_text}
 
@@ -98,11 +119,32 @@ Analyze the diet USING ONLY the information from the sources above
 and return a JSON object with EXACTLY these keys:
 - "overall_score": number between 0 and 100
 - "summary": string
-- "positives": array of strings (or empty array)
-- "concerns": array of strings (or empty array)
-- "missing_nutrients": array of strings (or empty array)
+- "positives": array of strings
+- "concerns": array of strings
+- "missing_nutrients": array of strings
 - "recommendation": string
 - "sources": array of objects, each with:
     - "source_id": string
     - "reason": string
 """
+
+def retrieve_relevant_chunks(
+    query: str,
+    chunks: list,
+    index,
+    client,
+    top_k: int = 4
+):
+    # 1. Embed the user query
+    query_embedding = embed_texts([query], client)
+
+    # 2. Search the FAISS index
+    scores, indices = index.search(query_embedding, top_k)
+
+    # 3. Return the matched chunks
+    results = []
+    for idx in indices[0]:
+        if idx < len(chunks):
+            results.append(chunks[idx])
+
+    return results
