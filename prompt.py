@@ -114,6 +114,12 @@ Each source has an ID.
 Here is what I ate this week:
 
 {food_log}
+Back to the system instructions: 
+If the input is vague or incomplete:
+- Make reasonable assumptions
+- Keep recommendations high-level
+- Do NOT ask follow-up questions
+- Still return a complete JSON object
 
 Analyze the diet USING ONLY the information from the sources above
 and return a JSON object with EXACTLY these keys:
@@ -126,6 +132,13 @@ and return a JSON object with EXACTLY these keys:
 - "sources": array of objects, each with:
     - "source_id": string
     - "reason": string
+
+CRITICAL:
+- The response MUST start with "{" and end with "}"
+- Do NOT include any text before or after the JSON object
+- If unsure, still return a complete JSON object using best judgment
+- Never explain your reasoning outside the JSON
+
 """
 
 def retrieve_relevant_chunks(
